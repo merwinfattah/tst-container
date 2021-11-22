@@ -1,0 +1,55 @@
+# docker-compose.yml
+version: '3.5'
+services:
+  postgres:
+    container_name: postgres_container
+    image: postgres
+    environment:
+      POSTGRES_USER: merv
+      POSTGRES_PASSWORD: 123
+      POSTGRES_DB: userauth
+    volumes:
+       - /postgres/pgdata:/data/postgres
+    ports:
+      - "5432:5432"
+    networks:
+      - local-net
+    restart: unless-stopped
+  
+ 
+  backend:
+    links:
+      - postgres
+    depends_on:
+      - postgres
+    container_name: backend
+    build: ./be/
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./be:/usr/src/server
+    networks:
+      - local-net
+
+  frontend:
+    links:
+      - backend
+    depends_on:
+      - backend
+    container_name: frontend
+    build: ./fe/auth/
+    ports:
+      - 3000:80
+    stdin_open: true
+    tty: true 
+    networks:
+      - local-net   
+
+
+
+networks:
+  local-net:
+    driver: bridge
+
+volumes:
+  database-data: # named volumes can be managed easier using docker-compose
