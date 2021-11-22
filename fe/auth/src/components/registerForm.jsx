@@ -21,7 +21,10 @@ class RegisterForm extends Form {
 
     doSubmit = async () => {
         try{
-        await userService.register(this.state.data);
+        const res = await userService.register(this.state.data);
+        if (res.status === 200) {
+            alert("You have already registered");
+        }
         }
         catch (e) {
             alert(e);
