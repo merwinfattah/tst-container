@@ -1,27 +1,32 @@
 # docker-compose.yml
 version: '3.5'
 services:
-  postgres:
-    container_name: postgres_container
-    image: postgres
+  # MySQL
+  database:
+    container_name: "db"
+    build: ./be/mysql
+    restart: always
+    tty: true
     environment:
-      POSTGRES_USER: merv
-      POSTGRES_PASSWORD: 123
-      POSTGRES_DB: userauth
-    volumes:
-       - /postgres/pgdata:/data/postgres
+      MYSQL_DATABASE: db
+      MYSQL_USER: merv
+      MYSQL_PASSWORD: password
+      MYSQL_ROOT_PASSWORD: password 
     ports:
-      - "5432:5432"
+      - "3306:3306"
+    volumes:
+      - ./be/mysql/initdb.d/schema.sql:/docker-entrypoint-initdb.d/1.sql
+      - ./be/mysql/conf.d:/etc/mysql/conf.db
+      - ./be/log/mysql:/var/log/mysql
     networks:
       - local-net
-    restart: unless-stopped
   
  
   backend:
     links:
-      - postgres
+      - database
     depends_on:
-      - postgres
+      - database
     container_name: backend
     build: ./be/
     ports:
@@ -51,5 +56,3 @@ networks:
   local-net:
     driver: bridge
 
-volumes:
-  database-data: # named volumes can be managed easier using docker-compose

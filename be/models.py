@@ -9,5 +9,5 @@ class UserData(Base):
     __tablename__ = "userData"
 
 
-    username = Column(String, primary_key=True)
-    password = Column(String)
+    username = Column(String(255), primary_key=True, nullable=False)
+    password = Column(String(255), nullable=False)
